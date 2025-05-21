@@ -1,7 +1,7 @@
 var d3;
 var data = "global_bleaching_environmental.csv";
-var w = 500;
-var h = 500;
+var w = 1920;
+var h = 1080;
 
 d3.csv(data).then(function (rawData) {
   const cleanData = rawData.filter(d => 
@@ -36,8 +36,11 @@ function buildIt() {
   var svg = d3
     .select(".container")
     .append("svg")
-    .attr("width", w)
-    .attr("height", h);
+    .attr("width", "90%")
+    .attr("height", "90%")
+    .attr("viewBox", `0 0 ${w} ${h}`);
+
+    var chartGroup = svg.append("g").attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
   var minX = d3.min(data, function (d) {
     return d.TSA_DHW;
