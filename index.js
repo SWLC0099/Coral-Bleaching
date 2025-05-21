@@ -3,20 +3,31 @@ var data = "global_bleaching_environmental.csv";
 var w = 500;
 var h = 500;
 
-d3.csv(data).then(function (dataset) {
-  // Convert and filter data
-  dataset = dataset
-    .map(function (d) {
-      d.TSA_DHW = +d.TSA_DHW;
-      d.Percent_Bleaching = +d.Percent_Bleaching;
-      d.Date_Year = +d.Date_Year;
-      return d;
-    })
-    .filter(function (d) {
-      return !isNaN(d.TSA_DHW) && !isNaN(d.Percent_Bleaching);
-    });
+d3.csv(data).then(function (rawData) {
+  const cleanData = rawData.filter(d => 
+    d.Percent_Bleaching !== "nd" &&
+    d.TSA_DHW !== "nd" &&
+    d.Date_Year !== "nd"
+  );
 
-  data = dataset;
+  cleanData.forEach(d => {
+    d.Percent_Bleaching = +d.Percent_Bleaching;
+    d.TSA_DHW = +d.TSA_DHW;
+    d.Date_Year = +d.Date_Year;
+  });
+
+  const latestBySite = new Map();
+
+  cleanData.forEach(d => {
+    const existing = latestBySite.get(d.Site_ID);
+    if(!existing || d.Date_Year > existing.Date_Year) {
+      latestBySite.set(d.Site_ID, d);
+    }
+  });
+
+  const filteredData = Array.from(latestBySite.values());
+
+  data = filteredData;
   buildIt();
 });
 
@@ -80,7 +91,7 @@ function buildIt() {
     .selectAll("text")
     .data(data)
     .enter()
-    .append("text")
+    //.append("text")
     .text(function (d) {
       return d.Date_Year;
     })
@@ -101,7 +112,7 @@ function buildIt() {
     .selectAll("text")
     .data(data)
     .enter()
-    .append("text")
+    //.append("text")
     .text(function (d) {
       return "This is bleach percentage" + d.Percent_Bleaching + "%";
     })
