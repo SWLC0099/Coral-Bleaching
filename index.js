@@ -57,7 +57,7 @@ const colorScale = d3.scaleSequential()
 
   let bleachingView = false;
 
-function buildIt() {
+function buildIt(renderData = data) {
   var svg = d3
     .select(".container")
     .append("svg")
@@ -123,7 +123,7 @@ function buildIt() {
   const centerY = h / 2;
 
   const root = d3
-    .hierarchy({ children: data })
+    .hierarchy({ children: renderData })
     .sum((d) => 1) // or size value
     .sort(() => Math.random()); // helps break up uniformity
 
@@ -142,13 +142,15 @@ function buildIt() {
     .attr("fill", (d) => colorScale(d.data.Percent_Bleaching))
     .on("mouseover", function (event, d) {
       // Highlight
-      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise(); 
+      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise();
       // Slightly smoother highlight
-      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2); 
-      
+      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2);
+
       // Tooltip
       d3.select("#tooltip").style("visibility", "visible").html(`
-          <strong>Site:</strong> ${d.data.Site_Name === "nd" ? "Unnamed" : d.data.Site_Name}<br>
+          <strong>Site:</strong> ${
+            d.data.Site_Name === "nd" ? "Unnamed" : d.data.Site_Name
+          }<br>
           <strong>Year:</strong> ${d.data.Date_Year}<br>
           <strong>Country:</strong> ${d.data.Country_Name || "Unknown"}<br>
           <strong>Ocean:</strong> ${d.data.Ocean_Name || "Unknown"}<br>
@@ -172,8 +174,8 @@ function buildIt() {
       // Hide tooltip
       d3.select("#tooltip").style("visibility", "hidden");
     });
-//    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
-//    .attr("fill-opacity", 0.8);
+  //    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
+  //    .attr("fill-opacity", 0.8);
 
   /*    .selectAll("circle")
     .data(data)
@@ -292,5 +294,100 @@ document.getElementById("toggleColors").addEventListener("click", () => {
     : "Switch to Bleaching View";
 });
 
+document.getElementById("sortOptions").addEventListener("change", function () {
+  const value = this.value;
+  let sortedData;
 
+  if (value === "bleachOuter") {
+    sortedData = [...data].sort(
+      (a, b) => b.Percent_Bleaching - a.Percent_Bleaching
+    );
+  } else if (value === "bleachInner") {
+    sortedData = [...data].sort(
+      (a, b) => a.Percent_Bleaching - b.Percent_Bleaching
+    );
+  } else if (value === "random") {
+    sortedData = [...data].sort(() => Math.random() - 0.5);
+  } else {
+    sortedData = data;
+  }
 
+  const newRoot = d3
+    .hierarchy({ children: sortedData })
+    .sum((d) => 1)
+    .sort(() => Math.random()); // helps avoid rigid structure
+
+  const newPacked = d3.pack().size([w, h]).padding(1)(newRoot);
+
+  // Update existing circles with transition
+  d3.selectAll("circle")
+    .data(newPacked.leaves(), (d) => d.data.Site_ID) // use Site_ID as a key
+    .transition()
+    .duration(1000)
+    .delay((d, i) => i * 2) // slight staggering
+    .ease(d3.easeQuadInOut)
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .attr("r", (d) => d.r);
+});
+
+const legendWidth = 280;
+const legendHeight = 20;
+
+const legendSvg = d3
+  .select("#legend")
+  .append("svg")
+  .attr("width", 360) // add room for padding/text
+  .attr("height", 60);
+
+// Create defs and gradient
+const defs = legendSvg.append("defs");
+const gradient = defs
+  .append("linearGradient")
+  .attr("id", "legendGradient")
+  .attr("x1", "0%")
+  .attr("x2", "100%")
+  .attr("y1", "0%")
+  .attr("y2", "0%");
+
+const numStops = 10;
+const step = 1 / (numStops - 1);
+d3.range(numStops).forEach((i) => {
+  gradient
+    .append("stop")
+    .attr("offset", `${i * step * 100}%`)
+    .attr("stop-color", d3.interpolateRainbow(i * step));
+});
+
+// Draw gradient bar
+const legendGroup = legendSvg
+  .append("g")
+  //.attr("transform", `translate(${(360 - legendWidth) / 2}, 0)`);
+
+// Draw gradient bar
+legendGroup
+  .append("rect")
+  .attr("x", 0) // starts at 0 within group
+  .attr("y", 10)
+  .attr("width", legendWidth)
+  .attr("height", legendHeight)
+  .style("fill", "url(#legendGradient)")
+  .style("rx", 6)
+  .style("ry", 6);
+
+// Add text labels
+legendGroup
+  .append("text")
+  .attr("x", 0)
+  .attr("y", 45)
+  .attr("text-anchor", "start")
+  .attr("class", "legend-label")
+  .text("0% bleaching");
+
+legendGroup
+  .append("text")
+  .attr("x", legendWidth)
+  .attr("y", 45)
+  .attr("text-anchor", "end")
+  .attr("class", "legend-label")
+  .text("100% bleaching");

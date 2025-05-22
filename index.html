@@ -5,25 +5,41 @@
 <title>Coral Bleaching</title>
 	<div id = "myVis"></div>
 	<script src="https://d3js.org/d3.v7.min.js"></script>
-	<button id="toggleColors">Toggle Bleaching View</button>
+
 </head>
 
 <body>
+	<div id="sidebar">
+		<div id="legend"></div>
+	  <div id="infoBox">
+		<h2>About Coral Bleaching</h2>
+		<p>
+		  Coral bleaching occurs when corals are stressed by changes in conditions such as temperature, light, or nutrients.
+		  One of the most significant stressors is rising sea temperatures.
+		</p>
+		<p>
+		  <strong>TSA_DHW</strong> (Thermal Stress Anomaly - Degree Heating Weeks) measures accumulated heat stress over 12 weeks.
+		  Higher TSA_DHW values correlate with increased coral bleaching.
+		</p>
+		<p>
+		  When water temperatures rise even 1–2°C above the normal maximum, and persist, it can lead to widespread bleaching events.
+		</p>
+		<p><em>Source: NOAA</em></p>
+	  </div>
+  
+	  <div id="controls">
+		<button id="toggleColors">Toggle Bleaching View</button>
+		<select id="sortOptions">
+		  <option value="none">Sort: None</option>
+		  <option value="bleachOuter">Bleach % (Outer High)</option>
+		  <option value="bleachInner">Bleach % (Inner High)</option>
+		</select>
+	  </div>
+	</div>
+  
 	<div class="container"></div>
 	<script src="index.js"></script>
-</body>
-
-<div id="tooltip" style="
-	position: absolute;
-	padding: 8px;
-	background: rgba(0, 0, 0, 0.7);
-	color: white;
-	border-radius: 4px;
-	pointer-events: none;
-	font-size: 12px;
-	visibility: hidden;
-	z-index: 10;
-"></div>
-
-
+	<div id="tooltip"></div>
+	
+  </body>
 </html>
