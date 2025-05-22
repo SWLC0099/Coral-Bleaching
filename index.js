@@ -52,6 +52,8 @@ const colorScale = d3.scaleSequential()
   .domain([0, 100])
   .interpolator(d3.interpolateRainbow); // or interpolateTurbo, interpolateWarm, etc.
 
+  let bleachingView = false;
+
 function buildIt() {
   var svg = d3
     .select(".container")
@@ -215,3 +217,45 @@ function buildIt() {
 
   svg.append("g").call(y_axis);
 }
+
+document.getElementById("toggleColors").addEventListener("click", () => {
+  bleachingView = !bleachingView;
+
+  d3.selectAll("circle")
+    .transition()
+    .duration(1500)
+    .ease(d3.easeCubic)
+    .attrTween("fill", function (d) {
+      const vibrant = d3.color(colorScale(d.data.Percent_Bleaching));
+      const bleachLevel = d.data.Percent_Bleaching / 100;
+      const startColor = d3.color(d3.select(this).attr("fill"));
+      const targetBleach = bleachingView ? bleachLevel : 0;
+
+      const rInterp = d3.interpolateNumber(
+        startColor.r,
+        vibrant.r + (255 - vibrant.r) * targetBleach
+      );
+      const gInterp = d3.interpolateNumber(
+        startColor.g,
+        vibrant.g + (255 - vibrant.g) * targetBleach
+      );
+      const bInterp = d3.interpolateNumber(
+        startColor.b,
+        vibrant.b + (255 - vibrant.b) * targetBleach
+      );
+
+      return function (t) {
+        const r = Math.round(rInterp(t));
+        const g = Math.round(gInterp(t));
+        const b = Math.round(bInterp(t));
+        return `rgb(${r}, ${g}, ${b})`;
+      };
+    });
+
+  document.getElementById("toggleColors").innerText = bleachingView
+    ? "Switch to Vibrant Coral View"
+    : "Switch to Bleaching View";
+});
+
+
+
