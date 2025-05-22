@@ -57,7 +57,7 @@ const colorScale = d3.scaleSequential()
 
   let bleachingView = false;
 
-function buildIt() {
+function buildIt(renderData = data) {
   var svg = d3
     .select(".container")
     .append("svg")
@@ -123,7 +123,7 @@ function buildIt() {
   const centerY = h / 2;
 
   const root = d3
-    .hierarchy({ children: data })
+    .hierarchy({ children: renderData })
     .sum((d) => 1) // or size value
     .sort(() => Math.random()); // helps break up uniformity
 
@@ -142,13 +142,15 @@ function buildIt() {
     .attr("fill", (d) => colorScale(d.data.Percent_Bleaching))
     .on("mouseover", function (event, d) {
       // Highlight
-      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise(); 
+      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise();
       // Slightly smoother highlight
-      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2); 
-      
+      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2);
+
       // Tooltip
       d3.select("#tooltip").style("visibility", "visible").html(`
-          <strong>Site:</strong> ${d.data.Site_Name === "nd" ? "Unnamed" : d.data.Site_Name}<br>
+          <strong>Site:</strong> ${
+            d.data.Site_Name === "nd" ? "Unnamed" : d.data.Site_Name
+          }<br>
           <strong>Year:</strong> ${d.data.Date_Year}<br>
           <strong>Country:</strong> ${d.data.Country_Name || "Unknown"}<br>
           <strong>Ocean:</strong> ${d.data.Ocean_Name || "Unknown"}<br>
@@ -172,8 +174,8 @@ function buildIt() {
       // Hide tooltip
       d3.select("#tooltip").style("visibility", "hidden");
     });
-//    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
-//    .attr("fill-opacity", 0.8);
+  //    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
+  //    .attr("fill-opacity", 0.8);
 
   /*    .selectAll("circle")
     .data(data)
@@ -292,5 +294,27 @@ document.getElementById("toggleColors").addEventListener("click", () => {
     : "Switch to Bleaching View";
 });
 
+document.getElementById("sortOptions").addEventListener("change", function () {
+  const value = this.value;
+  let sortedData;
+
+  if (value === "bleachOuter") {
+    sortedData = [...data].sort(
+      (a, b) => b.Percent_Bleaching - a.Percent_Bleaching
+    );
+  } else if (value === "bleachInner") {
+    sortedData = [...data].sort(
+      (a, b) => a.Percent_Bleaching - b.Percent_Bleaching
+    );
+  } else {
+    sortedData = [...data]; // default (unsorted, original)
+  }
+
+  // Clear existing SVG before rebuilding
+  d3.select(".container").selectAll("*").remove();
+
+  // Rebuild with sorted data
+  buildIt(sortedData);
+});
 
 
