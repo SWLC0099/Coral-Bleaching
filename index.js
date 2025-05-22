@@ -306,15 +306,29 @@ document.getElementById("sortOptions").addEventListener("change", function () {
     sortedData = [...data].sort(
       (a, b) => a.Percent_Bleaching - b.Percent_Bleaching
     );
+  } else if (value === "random") {
+    sortedData = [...data].sort(() => Math.random() - 0.5);
   } else {
-    sortedData = [...data]; // default (unsorted, original)
+    sortedData = data;
   }
 
-  // Clear existing SVG before rebuilding
-  d3.select(".container").selectAll("*").remove();
+  const newRoot = d3
+    .hierarchy({ children: sortedData })
+    .sum((d) => 1)
+    .sort(() => Math.random()); // helps avoid rigid structure
 
-  // Rebuild with sorted data
-  buildIt(sortedData);
+  const newPacked = d3.pack().size([w, h]).padding(1)(newRoot);
+
+  // Update existing circles with transition
+  d3.selectAll("circle")
+    .data(newPacked.leaves(), (d) => d.data.Site_ID) // use Site_ID as a key
+    .transition()
+    .duration(1000)
+    .delay((d, i) => i * 2) // slight staggering
+    .ease(d3.easeQuadInOut)
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .attr("r", (d) => d.r);
 });
 
 

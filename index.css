@@ -82,12 +82,49 @@ svg {
     background-color: #e55b50;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
-#controls {
+#sidebar {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px; /* spacing between infoBox and controls */
+    width: 320px; /* ensures both elements align nicely */
+}
+
+#infoBox {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#infoBox h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #FF6F61;
+}
+
+#controls button,
+#controls select {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #FF6F61;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#controls button:hover,
+#controls select:hover {
+    background-color: #e55b50;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }

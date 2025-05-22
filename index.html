@@ -9,16 +9,34 @@
 </head>
 
 <body>
-	<div id="controls">
+	<div id="sidebar">
+	  <div id="infoBox">
+		<h2>About Coral Bleaching</h2>
+		<p>
+		  Coral bleaching occurs when corals are stressed by changes in conditions such as temperature, light, or nutrients.
+		  One of the most significant stressors is rising sea temperatures.
+		</p>
+		<p>
+		  <strong>TSA_DHW</strong> (Thermal Stress Anomaly - Degree Heating Weeks) measures accumulated heat stress over 12 weeks.
+		  Higher TSA_DHW values correlate with increased coral bleaching.
+		</p>
+		<p>
+		  When water temperatures rise even 1–2°C above the normal maximum, and persist, it can lead to widespread bleaching events.
+		</p>
+	  </div>
+  
+	  <div id="controls">
 		<button id="toggleColors">Toggle Bleaching View</button>
 		<select id="sortOptions">
 		  <option value="none">Sort: None</option>
 		  <option value="bleachOuter">Bleach % (Outer High)</option>
 		  <option value="bleachInner">Bleach % (Inner High)</option>
 		</select>
+	  </div>
 	</div>
+  
 	<div class="container"></div>
 	<script src="index.js"></script>
 	<div id="tooltip"></div>
-</body>
+  </body>
 </html>
