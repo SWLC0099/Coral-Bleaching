@@ -331,4 +331,63 @@ document.getElementById("sortOptions").addEventListener("change", function () {
     .attr("r", (d) => d.r);
 });
 
+const legendWidth = 280;
+const legendHeight = 20;
 
+const legendSvg = d3
+  .select("#legend")
+  .append("svg")
+  .attr("width", 360) // add room for padding/text
+  .attr("height", 60);
+
+// Create defs and gradient
+const defs = legendSvg.append("defs");
+const gradient = defs
+  .append("linearGradient")
+  .attr("id", "legendGradient")
+  .attr("x1", "0%")
+  .attr("x2", "100%")
+  .attr("y1", "0%")
+  .attr("y2", "0%");
+
+const numStops = 10;
+const step = 1 / (numStops - 1);
+d3.range(numStops).forEach((i) => {
+  gradient
+    .append("stop")
+    .attr("offset", `${i * step * 100}%`)
+    .attr("stop-color", d3.interpolateRainbow(i * step));
+});
+
+// Draw gradient bar
+const legendGroup = legendSvg
+  .append("g")
+  //.attr("transform", `translate(${(360 - legendWidth) / 2}, 0)`);
+
+// Draw gradient bar
+legendGroup
+  .append("rect")
+  .attr("x", 0) // starts at 0 within group
+  .attr("y", 10)
+  .attr("width", legendWidth)
+  .attr("height", legendHeight)
+  .style("fill", "url(#legendGradient)")
+  .style("rx", 6)
+  .style("ry", 6);
+
+// Add text labels
+legendGroup
+  .append("text")
+  .attr("x", 0)
+  .attr("y", 45)
+  .attr("text-anchor", "start")
+  .attr("class", "legend-label")
+  .text("0% bleaching");
+
+legendGroup
+  .append("text")
+  .attr("x", legendWidth)
+  .attr("y", 45)
+  .attr("text-anchor", "end")
+  .attr("class", "legend-label")
+  .text("100% bleaching");
