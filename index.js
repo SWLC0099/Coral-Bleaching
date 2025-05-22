@@ -14,6 +14,9 @@ d3.csv(data).then(function (rawData) {
     d.Percent_Bleaching = +d.Percent_Bleaching;
     d.TSA_DHW = +d.TSA_DHW;
     d.Date_Year = +d.Date_Year;
+    d.Site_Name
+    d.Country_Name
+    d.Ocean_Name
   });
 
   const latestBySite = new Map();
@@ -139,17 +142,21 @@ function buildIt() {
     .attr("fill", (d) => colorScale(d.data.Percent_Bleaching))
     .on("mouseover", function (event, d) {
       // Highlight
-      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise(); // Bring to front
-
+      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise(); 
+      // Slightly smoother highlight
+      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2); 
+      
       // Tooltip
-      d3.select("#tooltip")
-        .style("visibility", "visible")
-        .html(
-          `<strong>Site:</strong> ${d.data.Site_ID}<br>
+      d3.select("#tooltip").style("visibility", "visible").html(`
+          <strong>Site:</strong> ${d.data.Site_Name === "nd" ? "Unnamed" : d.data.Site_Name}<br>
           <strong>Year:</strong> ${d.data.Date_Year}<br>
-          <strong>Bleaching:</strong> ${d.data.Percent_Bleaching}%<br>
-          <strong>DHW:</strong> ${d.data.TSA_DHW}`
-        );
+          <strong>Country:</strong> ${d.data.Country_Name || "Unknown"}<br>
+          <strong>Ocean:</strong> ${d.data.Ocean_Name || "Unknown"}<br>
+          <strong>Bleaching:</strong> ${d.data.Percent_Bleaching.toFixed(
+            1
+          )}%<br>
+          <strong>Thermal Stress (DHW):</strong> ${d.data.TSA_DHW.toFixed(1)}
+        `);
     })
     .on("mousemove", function (event) {
       d3.select("#tooltip")
@@ -159,6 +166,8 @@ function buildIt() {
     .on("mouseout", function () {
       // Remove highlight
       d3.select(this).attr("stroke", null).attr("stroke-width", null);
+      // Remove Slightly smoother highlight
+      //d3.select(this).transition().duration(150).attr("stroke", null).attr("stroke-width", null);
 
       // Hide tooltip
       d3.select("#tooltip").style("visibility", "hidden");
