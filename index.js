@@ -36,8 +36,8 @@ d3.csv(data).then(function (rawData) {
 
 function randomVibrantColor() {
   const hue = Math.floor(Math.random() * 360); // full hue range
-  const saturation = 90 + Math.random() * 10; // 90–100%
-  const lightness = 45 + Math.random() * 10; // 45–55%
+  const saturation = 90 + Math.random() * 10;
+  const lightness = 45 + Math.random() * 10; 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -53,7 +53,7 @@ const reefColors = [
 
 const colorScale = d3.scaleSequential()
   .domain([0, 100])
-  .interpolator(d3.interpolateRainbow); // or interpolateTurbo, interpolateWarm, etc.
+  .interpolator(d3.interpolateRainbow); 
 
   let bleachingView = false;
 
@@ -65,36 +65,15 @@ function buildIt(renderData = data) {
     .attr("height", "90%")
     .attr("viewBox", `0 0 ${w} ${h}`);
 
-  // Add dark ocean-like background
+  // dark ocean-like background
   svg
     .append("rect")
     .attr("width", w)
     .attr("height", h)
     .attr("x", 0)
     .attr("y", 0)
-    .attr("fill", "#001f3f"); // A deep blue color
+    .attr("fill", "#001f3f"); // Dark ocean blue color
 
-  /* Animated force directed collision layout
-    const simulation = d3
-      .forceSimulation(data)
-      .force("x", d3.forceX(w / 2).strength(0.05))
-      .force("y", d3.forceY(h / 2).strength(0.05))
-      .force("collision", d3.forceCollide().radius(4)) // avoid overlap
-      .on("tick", ticked);
-
-    function ticked() {
-      const u = svg.selectAll("circle").data(data);
-
-      u.enter()
-        .append("circle")
-        .attr("r", 3)
-        .merge(u)
-        .attr("cx", (d) => d.x)
-        .attr("cy", (d) => d.y)
-        .attr("fill", "#2962FF");
-    }
-*/
-  //  var chartGroup = svg.append("g").attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
   var minX = d3.min(data, function (d) {
     return d.TSA_DHW;
@@ -116,7 +95,7 @@ function buildIt(renderData = data) {
   var x_axis = d3.axisBottom().scale(xScale);
   var y_axis = d3.axisLeft().scale(yScale);
 
-  /* ===== circles ===== */
+
 
   const radius = 500;
   const centerX = w / 2;
@@ -124,10 +103,10 @@ function buildIt(renderData = data) {
 
   const root = d3
     .hierarchy({ children: renderData })
-    .sum((d) => 1) // or size value
-    .sort(() => Math.random()); // helps break up uniformity
+    .sum((d) => 1)
+    .sort(() => Math.random()); 
 
-  const packLayout = d3.pack().size([w, h]).padding(1); // space between circles
+  const packLayout = d3.pack().size([w, h]).padding(1); 
 
   const packed = packLayout(root);
 
@@ -143,8 +122,6 @@ function buildIt(renderData = data) {
     .on("mouseover", function (event, d) {
       // Highlight
       d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise();
-      // Slightly smoother highlight
-      //d3.select(this).transition().duration(150).attr("stroke", "white").attr("stroke-width", 2);
 
       // Tooltip
       d3.select("#tooltip").style("visibility", "visible").html(`
@@ -168,49 +145,23 @@ function buildIt(renderData = data) {
     .on("mouseout", function () {
       // Remove highlight
       d3.select(this).attr("stroke", null).attr("stroke-width", null);
-      // Remove Slightly smoother highlight
-      //d3.select(this).transition().duration(150).attr("stroke", null).attr("stroke-width", null);
 
       // Hide tooltip
       d3.select("#tooltip").style("visibility", "hidden");
     });
-  //    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
-  //    .attr("fill-opacity", 0.8);
 
-  /*    .selectAll("circle")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", (d, i) => centerX + radius * Math.cos((2 * Math.PI * i) / data.length))
-    .attr("cy", (d, i) => centerX + radius * Math.sin((2 * Math.PI * i) / data.length))
-    .attr("r", 2)
-    .attr("cx", function (d) {
-      return xScale(d.TSA_DHW);
-      // return xPositioning(d);
-    })
-    .attr("cy", function (d) {
-      return yScale(d.Percent_Bleaching);
-      // return yPositioning(d)
-    })
-    .attr("r", function (d) {
-      return circleCenter(d) * 8;
-    }) 
-    .attr("fill", "#2962FF");
-    */
-
-  /* ===== radii ===== */
 
   function circleCenter(d) {
     return Math.sqrt(d.Percent_Bleaching);
   }
 
-  /* ===== year labels ===== */
+
 
   svg
     .selectAll("text")
     .data(data)
     .enter()
-    //.append("text")
+
     .text(function (d) {
       return d.Date_Year;
     })
@@ -224,14 +175,11 @@ function buildIt(renderData = data) {
     .attr("font-size", "12")
     .attr("fill", "white");
 
-  /* ===== average ticket prices labels ===== */
-
   svg
     .append("g")
     .selectAll("text")
     .data(data)
     .enter()
-    //.append("text")
     .text(function (d) {
       return "This is bleach percentage" + d.Percent_Bleaching + "%";
     })
@@ -244,8 +192,6 @@ function buildIt(renderData = data) {
     })
     .attr("font-size", "11")
     .attr("fill", "#546c78");
-
-  /* ===== axes ===== */
 
   svg
     .append("g")
@@ -315,16 +261,15 @@ document.getElementById("sortOptions").addEventListener("change", function () {
   const newRoot = d3
     .hierarchy({ children: sortedData })
     .sum((d) => 1)
-    .sort(() => Math.random()); // helps avoid rigid structure
+    .sort(() => Math.random()); 
 
   const newPacked = d3.pack().size([w, h]).padding(1)(newRoot);
 
-  // Update existing circles with transition
   d3.selectAll("circle")
-    .data(newPacked.leaves(), (d) => d.data.Site_ID) // use Site_ID as a key
+    .data(newPacked.leaves(), (d) => d.data.Site_ID) 
     .transition()
     .duration(1000)
-    .delay((d, i) => i * 2) // slight staggering
+    .delay((d, i) => i * 2) 
     .ease(d3.easeQuadInOut)
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
@@ -337,10 +282,9 @@ const legendHeight = 20;
 const legendSvg = d3
   .select("#legend")
   .append("svg")
-  .attr("width", 360) // add room for padding/text
+  .attr("width", 360)
   .attr("height", 60);
 
-// Create defs and gradient
 const defs = legendSvg.append("defs");
 const gradient = defs
   .append("linearGradient")
@@ -359,15 +303,12 @@ d3.range(numStops).forEach((i) => {
     .attr("stop-color", d3.interpolateRainbow(i * step));
 });
 
-// Draw gradient bar
 const legendGroup = legendSvg
   .append("g")
-  //.attr("transform", `translate(${(360 - legendWidth) / 2}, 0)`);
 
-// Draw gradient bar
 legendGroup
   .append("rect")
-  .attr("x", 0) // starts at 0 within group
+  .attr("x", 0) 
   .attr("y", 10)
   .attr("width", legendWidth)
   .attr("height", legendHeight)
@@ -375,7 +316,6 @@ legendGroup
   .style("rx", 6)
   .style("ry", 6);
 
-// Add text labels
 legendGroup
   .append("text")
   .attr("x", 0)
