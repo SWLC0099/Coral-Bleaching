@@ -137,6 +137,32 @@ function buildIt() {
     .attr("cy", (d) => d.y)
     .attr("r", (d) => d.r)
     .attr("fill", (d) => colorScale(d.data.Percent_Bleaching))
+    .on("mouseover", function (event, d) {
+      // Highlight
+      d3.select(this).attr("stroke", "white").attr("stroke-width", 2).raise(); // Bring to front
+
+      // Tooltip
+      d3.select("#tooltip")
+        .style("visibility", "visible")
+        .html(
+          `<strong>Site:</strong> ${d.data.Site_ID}<br>
+          <strong>Year:</strong> ${d.data.Date_Year}<br>
+          <strong>Bleaching:</strong> ${d.data.Percent_Bleaching}%<br>
+          <strong>DHW:</strong> ${d.data.TSA_DHW}`
+        );
+    })
+    .on("mousemove", function (event) {
+      d3.select("#tooltip")
+        .style("top", event.pageY + 15 + "px")
+        .style("left", event.pageX + 15 + "px");
+    })
+    .on("mouseout", function () {
+      // Remove highlight
+      d3.select(this).attr("stroke", null).attr("stroke-width", null);
+
+      // Hide tooltip
+      d3.select("#tooltip").style("visibility", "hidden");
+    });
 //    .attr("fill", () => reefColors[Math.floor(Math.random() * reefColors.length)])
 //    .attr("fill-opacity", 0.8);
 
