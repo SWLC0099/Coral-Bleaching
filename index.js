@@ -244,11 +244,11 @@ document.getElementById("sortOptions").addEventListener("change", function () {
   const value = this.value;
   let sortedData;
 
-  if (value === "bleachOuter") {
+  if (value === "bleachInner") {
     sortedData = [...data].sort(
       (a, b) => b.Percent_Bleaching - a.Percent_Bleaching
     );
-  } else if (value === "bleachInner") {
+  } else if (value === "bleachOuter") {
     sortedData = [...data].sort(
       (a, b) => a.Percent_Bleaching - b.Percent_Bleaching
     );
